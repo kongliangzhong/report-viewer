@@ -1,0 +1,9 @@
+<div class="col-sm-3 col-md-2 sidebar">
+  <ul class="nav nav-sidebar">
+    <li {{if eq . 1}} class="active" {{end}}><a href="/">首页</a></li>
+    <li {{if eq . 2}} class="active" {{end}}><a href="/new-chart">新建报表</a></li>
+    <li {{if eq . 3}} class="active" {{end}}><a href="/chart-list">报表列表</a></li>
+    <li {{if eq . 4}} class="active" {{end}}><a href="#">自定义报表</a></li>
+    <li {{if eq . 5}} class="active" {{end}}><a href="#">数据导入</a></li>
+  </ul>
+</div>

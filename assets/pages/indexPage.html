@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html  lang="zh">
+  {{template "header.html"}}
+
+  <body>
+    {{template "navbarTop.html"}}
+
+    <div class="container-fluid">
+      <div class="row">
+        {{template "navbarSide.html" 1}}
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <h1 class="page-header">最近报表展示</h1>
+          <div class="row placeholders"></div>
+          <!-- <h2 class="sub-header">全部报表列表</h2>
+            <div class="table-responsive">
+            <table class="table table-striped">
+            <thead>
+            <tr>
+            <th>#</th>
+            <th>标题</th>
+            <th>描述</th>
+            <th>创建时间</th>
+            <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range $index, $item := .ReportItems}}
+            <tr>
+            <td>{{$index}}</td>
+            <td>{{$item.Title}}</td>
+            <td>{{$item.Desc}}</td>
+            <td>{{$item.CreateTime}}</td>
+            <td><a href="/report-item/{{$item.Id}}">详细</a></td>
+            </tr>
+            {{end}}
+            </tbody>
+            </table>
+            </div>-->
+        </div>
+
+      </div>
+    </div>
+    <script src="/assets/js/jquery-1.12.3.min.js"></script>
+    <script src="assets/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+    <script src="assets/js/index.js"></script>
+  </body>
+</html>

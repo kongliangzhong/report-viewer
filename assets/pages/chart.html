@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  {{template "header.html"}}
+
+  <body>
+    {{template "navbarTop.html"}}
+
+    <div>
+      <input id="chartdata-id" type="hidden" value="{{.Id}}"/>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        {{template "navbarSide.html" 3}}
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div id="main" style="width: 800px;height:600px; margin:10 auto;"></div>
+        </div>
+
+      </div>
+
+    <script src="/assets/js/jquery-1.12.3.min.js"></script>
+    <script src="/assets/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+    <script src="/assets/js/echarts.min.js"></script>
+    <script src="/assets/js/chart.js"></script>
+  </body>
+</html>
