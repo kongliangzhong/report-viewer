@@ -70,13 +70,14 @@ var basePieOption =
 var id = $("#chartdata-id").val();
 
 $.get("/chart-data/" + id, function(data, status){
-    //console.debug("data:", data);
-    var handlerKey = data.handlerKey;
-    console.debug("handlerKey:", handlerKey);
-    var setter = allOptionSetters[handlerKey];
-    var option = setter(data);
+    console.debug("data:", data);
+    //var handlerKey = data.handlerKey;
+    //console.debug("handlerKey:", handlerKey);
+    //var setter = allOptionSetters[handlerKey];
+    //var option = setter(data);
     //console.debug("option:", option);
-    myChart.setOption(option);
+    //console.debug("data json:", JSON.stringify(data, null, 2));
+    myChart.setOption(data);
 });
 
 var setFeatureBarData =  function(data) {

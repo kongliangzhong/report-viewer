@@ -3,12 +3,17 @@ package main
 type ReportItem struct {
     Id            string
     Title         string
+    Legend        string
     Desc          string
     CreateTime    string
     TableName     string
+    DataField     string
+    DataFormat    string
+    ChartType     string
     HandlerKey    string
-    ShowTimeLine  bool   // timeline support
+    ShowTimeLine  bool // timeline support
     TimeLineField string
+    //XAxisType     string
 }
 
 // type ChartDataRaw struct {
@@ -23,7 +28,8 @@ type PieDataItem struct {
 }
 
 type ChartData struct {
-    Title       string
-    HandlerKey  string
-    OptionsData []interface{}
+    Title        string
+    HandlerKey   string
+    ShowTimeLine bool
+    OptionsData  []interface{}
 }

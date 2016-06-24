@@ -7,7 +7,6 @@ import (
     "log"
     "net/http"
     "strconv"
-    "strings"
 )
 
 type ChartListPageModel struct {
@@ -33,10 +32,63 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func NewChartPage(w http.ResponseWriter, r *http.Request) {
-    t, _ := template.ParseFiles(concatPageList("assets/pages/newChart.html")...);
-    err := t.Execute(w, nil)
+    t, _ := template.ParseFiles(concatPageList("assets/pages/newChart.html")...)
+    err := t.Execute(w, struct {
+        Flag    int
+        Message string
+    }{})
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
+    }
+}
+
+func AddChart(w http.ResponseWriter, r *http.Request) {
+    title := r.FormValue("reportTitle")
+    tableName := r.FormValue("tableName")
+    dataField := r.FormValue("dataField")
+    dataFormat := r.FormValue("dataFormat")
+    chartType := r.FormValue("chartType")
+    legend := r.FormValue("legend")
+    timeLineFiled := r.FormValue("timeLineField")
+
+    ri := ReportItem{Title: title, Legend: legend, Desc: "", TableName: tableName,
+        DataField: dataField, DataFormat: dataFormat, ChartType: chartType, HandlerKey: "",
+        ShowTimeLine: true, TimeLineField: timeLineFiled}
+
+    err := dataService.SaveReportItem(ri)
+
+    log.Println("title:", title)
+    t, _ := template.ParseFiles(concatPageList("assets/pages/newChart.html")...)
+
+    paramLabels := []string{"数据表名", "数据字段名", "数据格式", "图表类型", "图例说明", "时间轴字段名"}
+    nonNullableParams := []string{tableName, dataField, dataFormat, chartType, legend, timeLineFiled}
+    for i, p := range nonNullableParams {
+        log.Println("p:", p)
+        if p == "" {
+            t.Execute(w, struct {
+                Flag    int
+                Message string
+            }{0, "创建失败，字段" + paramLabels[i] + "不能为空"})
+            return
+        }
+    }
+
+    if err != nil {
+        err2 := t.Execute(w, struct {
+            Flag    int
+            Message string
+        }{0, "创建报表失败! 错误信息：" + err.Error()})
+        if err2 != nil {
+            http.Error(w, err2.Error(), http.StatusInternalServerError)
+        }
+    } else {
+        err = t.Execute(w, struct {
+            Flag    int
+            Message string
+        }{1, "创建报表成功！"})
+        if err != nil {
+            http.Error(w, err.Error(), http.StatusInternalServerError)
+        }
     }
 }
 
@@ -88,8 +140,9 @@ func ChartDataRouter(w http.ResponseWriter, r *http.Request) {
 
     ri := dataService.GetReportItem(idi)
     //log.Println("ri:", ri)
-    data := getData(ri)
-    //log.Println("data:", data)
+    //data := getData(ri)
+    data := getChartData(ri)
+    //log.Println("chart data:", data)
 
     if data == nil {
         http.Error(w, "data is nil", http.StatusInternalServerError)
@@ -103,76 +156,82 @@ func ChartDataRouter(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-func getData(ri ReportItem) interface{} {
-    switch ri.HandlerKey {
-    case "feat2-bar":
-        return feat2Data(ri)
-    case "feat10-pie":
-        return feat10Data(ri)
-    default:
-        log.Println("can not found handler for key:", ri.HandlerKey)
-        return nil
-    }
-}
-
-func feat10Data(ri ReportItem) interface{} {
-    pieData := struct {
-        HandlerKey string        `json:"handlerKey"`
-        Title      string        `json:"title"`
-        Data       []PieDataItem `json:"data"`
-    }{}
-    pieData.HandlerKey = ri.HandlerKey
-    pieData.Title = "feat10 piechart"
-    pieData.Data = []PieDataItem{
-        PieDataItem{32, "a"},
-        PieDataItem{43, "b"},
-        PieDataItem{87, "c"},
-    }
-    return pieData
-}
-
-func feat2Data(ri ReportItem) interface{} {
-    barData := struct {
-        HandlerKey string   `json:"handlerKey"`
-        Legend     []string `json:"legend"`
-        XAxisType  string   `json:"xAxisType"`
-        Data       [][]int  `json:"data"`
-    }{}
-
-    barData.HandlerKey = ri.HandlerKey
-    barData.Legend = []string{"feat2"}
-    barData.XAxisType = "value"
-
-    var content string
-    qSql := "select distribution from feat2 limit 1"
-    err := dataService.QueryRow(qSql, &content)
+func getChartData(ri ReportItem) interface{} {
+    datas, timelineData, err := dataService.GetDataByTimeline(ri.TableName, ri.DataField, ri.TimeLineField)
     if err != nil {
-        log.Println("ERRORxxx:", err)
+        log.Println("Error:", err.Error())
         return nil
     }
-    //log.Println("content:", content)
+    //log.Println("datas", datas)
 
-    data := [][]int{}
-    entries := strings.Split(content, " ")
-    for _, e := range entries {
-        flds := strings.Split(e, ":")
-        if len(flds) < 2 {
-            log.Println("ERROR: can not parse kv:", e)
+    switch ri.ChartType {
+    case "bar":
+        return genBarOption(datas, timelineData, ri.DataFormat)
+    case "pie":
+        return genPieOption(datas, timelineData)
+    default:
+        log.Println("Unknown chart-type:", ri.ChartType)
+        return nil
+    }
+}
+
+func genBarOption(rawDatas, timelineData []string, dataFormat string) interface{} {
+    var genSeriesData = func(xdata []string, ydata []float64, xaxisType string) (interface{}, error) {
+        if xaxisType == "category" {
+            return ydata, nil
         } else {
-            x, err := strconv.Atoi(flds[0])
+            xdataF64, err := StrArrToF64Arr(xdata)
             if err != nil {
-                log.Println("Atoi failed:", err)
-                continue
+                return nil, err
             }
-            y, err := strconv.Atoi(flds[1])
-            if err != nil {
-                log.Println("Atoi failed:", err)
-                continue
-            }
-            data = append(data, []int{x, y})
+            return ZipF64(xdataF64, ydata)
         }
     }
-    barData.Data = data
 
-    return barData
+    baseBarOption := NewBaseBarOption()
+    baseBarOption.Timeline= TimelineType{"category", timelineData}
+
+    parseResultArr, err := parseRawDatas(rawDatas, dataFormat)
+    if err != nil {
+        log.Println("Error:", err.Error())
+        return nil
+    }
+
+    xaxisType, err := parseResultArr.detectXAxisType()
+    if err != nil {
+        log.Println("XAxis Type can not detected. ", err.Error())
+        return nil
+    }
+
+    baseBarOption.XAxis = append(baseBarOption.XAxis, SimpleData{Type: xaxisType})
+
+    if xaxisType == "category" {
+        baseBarOption.XAxis[0].Data = parseResultArr[0].xdata
+    }
+
+    timeLineOptions := []TimelineOption{}
+    for _, res := range parseResultArr {
+        st := SeriesType{Type: "bar"}
+        baseBarOption.Series = append(baseBarOption.Series, st)
+
+        tlo := TimelineOption{}
+        for _, yd := range res.ydata {
+            seriesData, err := genSeriesData(res.xdata, yd, xaxisType)
+            if err != nil {
+                log.Println("Error:", err.Error())
+                continue
+            }
+            ser := SeriesType{Data: seriesData}
+            tlo.Series = append(tlo.Series, ser)
+        }
+        timeLineOptions = append(timeLineOptions, tlo)
+    }
+
+    resultOption := FullOption{baseBarOption, timeLineOptions}
+    return resultOption
+}
+
+func genPieOption(rawDatas, timelineData []string) interface{} {
+
+    return nil
 }

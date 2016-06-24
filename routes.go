@@ -23,6 +23,12 @@ var routes = []Route{
         NewChartPage,
     },
     Route{
+        "add report item",
+        "Post",
+        "/add-chart",
+        AddChart,
+    },
+    Route{
         "Mysql DB Connections",
         "Get",
         "/mysql-conns",

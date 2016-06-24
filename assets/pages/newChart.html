@@ -11,6 +11,7 @@
   </head>
 
   <body>
+
     {{template "navbarTop.html"}}
 
     <div class="container-fluid">
@@ -19,7 +20,84 @@
 
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
           <h1 class="page-header">新建报表</h1>
-          <div class="row placeholders"></div>
+
+          {{$mlen := len .Message}}
+          {{if gt $mlen 0}}
+          <div class="col-sm-6 alert {{if eq .Flag 1}}alert-success{{else}}alert-danger{{end}}" role="alert">
+            {{.Message}}
+          </div>
+          {{end}}
+
+          <div class="row">
+            <div class="col-sm-11">
+
+              <form method="POST" action="/add-chart">
+                <div class="form-group row">
+                  <div class="col-sm-6">
+                    <label for="reportTitle" class="col-sm-3 form-control-label">报表名称</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" id="reportTitle" name="reportTitle" placeholder="报表名称">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <div class="col-sm-6">
+                    <label for="tableName" class="col-sm-3 form-control-label">数据表名</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="tableName" placeholder="">
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6">
+                    <label for="dataField" class="col-sm-3 form-control-label">数据字段名</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="dataField" placeholder="">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <div class="col-sm-6">
+                    <label for="dataFormat" class="col-sm-3 form-control-label">字段格式</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="dataFormat" placeholder="x:y|x:y:y">
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6">
+                    <label for="chartType" class="col-sm-3 form-control-label">图表类型</label>
+                    <div class="col-sm-9">
+                      <select class="form-control" name="chartType">
+                        <option value="bar">柱图</option>
+                        <option value="pie">饼图</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <div class="col-sm-6">
+                    <label for="legend" class="col-sm-3 form-control-label">图例说明</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="legend" placeholder="">
+                    </div>
+                  </div>
+
+                  <div class="col-sm-6">
+                    <label for="timeLineField" class="col-sm-3 form-control-label">时间轴字段名</label>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="timeLineField" placeholder="">
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="col-sm-offset-1 btn btn-primary">提交</button>
+
+              </form>
+            </div>
+          </div>
+
         </div>
 
       </div>
