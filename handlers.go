@@ -7,6 +7,7 @@ import (
     "log"
     "net/http"
     "strconv"
+    "sort"
 )
 
 type ChartListPageModel struct {
@@ -189,7 +190,7 @@ func genBarOption(rawDatas, timelineData []string, dataFormat string) interface{
     }
 
     baseBarOption := NewBaseBarOption()
-    baseBarOption.Timeline= TimelineType{XAxisType_C, timelineData}
+    baseBarOption.Timeline= TimelineType{XAxisType_C, timelineData, []int{10,0,0,0}}
 
     parseResultArr, err := parseRawDatas(rawDatas, dataFormat)
     if err != nil {
@@ -233,7 +234,7 @@ func genBarOption(rawDatas, timelineData []string, dataFormat string) interface{
 
 func genPieOption(rawDatas, timelineData []string, dataFormat string) interface{} {
     basePieOption := NewBasePieOption()
-    basePieOption.Timeline= TimelineType{XAxisType_C, timelineData}
+    basePieOption.Timeline= TimelineType{XAxisType_C, timelineData, []int{20,0,0,0}}
 
     parseResultArr, err := parseRawDatas(rawDatas, dataFormat)
     if err != nil {
@@ -244,16 +245,38 @@ func genPieOption(rawDatas, timelineData []string, dataFormat string) interface{
     timelineOptions := []TimelineOption{}
     for _, res := range parseResultArr {
         tlo := TimelineOption{}
-        data := []PieDataItem{}
-        log.Println("res:", res)
+        data := PieData{}
+        //log.Println("res:", res)
         for i, name := range res.xdata {
             item := PieDataItem{name, res.ydata[0][i]}
             data = append(data, item)
         }
+
+        data = dataPrune(data)
+
         tlo.Series = append(tlo.Series, SeriesType{Data: data})
         timelineOptions = append(timelineOptions, tlo)
     }
 
     resultOption := FullOption{basePieOption, timelineOptions}
     return resultOption
+}
+
+const PieDataLenMax = 10
+func dataPrune (data PieData) PieData {
+    sort.Sort(data)
+    var otherVal float64
+    for i, di := range data {
+        if i >= PieDataLenMax {
+            otherVal = otherVal + di.Value
+        }
+    }
+
+    if len(data) > PieDataLenMax {
+        data = data[:PieDataLenMax]
+        otherItem := PieDataItem{"Other", otherVal}
+        data = append(data, otherItem)
+    }
+
+    return data
 }

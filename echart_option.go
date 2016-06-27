@@ -19,13 +19,18 @@ type BaseBarOption struct {
                 Type []string `json:"type"`
             } `json:"magicType"`
             Restore struct {
-                Show bool `json: "show"`
+                Show bool `json:"show"`
             } `json:"restore"`
             SaveAsImage struct {
-                Show bool `json: "show"`
-            } `json: "saveAsImage"`
+                Show bool `json:"show"`
+            } `json:"saveAsImage"`
         } `json:"feature"`
     } `json:"toolbox"`
+
+    Grid struct {
+        Top    int `json:"top,omitempty"`
+        Bottom int `json:"bottom,omitempty"`
+    } `json:"grid,omitempty"`
 
     Legend struct {
         Data []string `json:"data"`
@@ -42,6 +47,7 @@ type BaseBarOption struct {
 type TimelineType struct {
     AxisType string   `json:"axisType"`
     Data     []string `json:"data"`
+    Padding  []int    `json:"padding,omitempty"`
 }
 
 type SimpleData struct {
@@ -54,7 +60,7 @@ type SeriesType struct {
     Type   string      `json:"type,omitempty"`
     Name   string      `json:"name,omitempty"`
     Center []string    `json:"center,omitempty"`
-    Radius []string      `json:"radius,omitempty"`
+    Radius []string    `json:"radius,omitempty"`
     Data   interface{} `json:"data,omitempty"`
 }
 
@@ -64,7 +70,7 @@ type TooltipType struct {
 
 type BasePieOption struct {
     Timeline TimelineType `json:"timeline"`
-    Title struct {
+    Title    struct {
         Text    string `json:"text"`
         Subtext string `json:"subtext"`
         X       string `json:"x"`
@@ -91,7 +97,7 @@ type FullOption struct {
 type BasePieSeriesType struct {
     Name   string      `json:"name,omitempty"`
     Type   string      `json:"type,omitempty"`
-    Radius []string      `json:"radius,omitempty"`
+    Radius []string    `json:"radius,omitempty"`
     Center []string    `json:"center,omitempty"`
     Data   interface{} `json:"data,omitempty"`
 
@@ -122,6 +128,8 @@ func NewBaseBarOption() BaseBarOption {
     bbo.Toolbox.Feature.MagicType.Type = []string{"line", "bar"}
     bbo.Toolbox.Feature.Restore.Show = true
     bbo.Toolbox.Feature.SaveAsImage.Show = true
+    bbo.Grid.Top = 80
+    bbo.Grid.Bottom = 100
 
     // enc := json.NewEncoder(os.Stdout)
     // enc.Encode(bbo)
@@ -135,7 +143,7 @@ func NewBasePieOption() BasePieOption {
     basePieOption.Tooltip.Trigger = "item"
     basePieOption.Tooltip.Formatter = "{b} : {c} ({d}%)"
 
-    series0 := BasePieSeriesType{Type: "pie", Radius: []string{"0", "75%"},
+    series0 := BasePieSeriesType{Type: "pie", Radius: []string{"0", "60%"},
         Center: []string{"50%", "50%"},
         ItemStyle: ItemStyleType{
             Emphasis: EmphasisType{

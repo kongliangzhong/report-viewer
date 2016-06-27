@@ -76,7 +76,7 @@ $.get("/chart-data/" + id, function(data, status){
     //var setter = allOptionSetters[handlerKey];
     //var option = setter(data);
     //console.debug("option:", option);
-    console.debug("data json:", JSON.stringify(data, null, 2));
+    console.debug("data json:", JSON.stringify(data));
     myChart.setOption(data);
 });
 

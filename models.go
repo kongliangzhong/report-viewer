@@ -23,9 +23,15 @@ type ReportItem struct {
 // }
 
 type PieDataItem struct {
-    Name  string `json:"name"`
-    Value float64    `json:"value"`
+    Name  string  `json:"name"`
+    Value float64 `json:"value"`
 }
+
+type PieData []PieDataItem
+
+func (pd PieData) Len() int           { return len(pd) }
+func (pd PieData) Swap(i, j int)      { pd[j], pd[i] = pd[i], pd[j] }
+func (pd PieData) Less(i, j int) bool { return pd[i].Value > pd[j].Value }
 
 type ChartData struct {
     Title        string
