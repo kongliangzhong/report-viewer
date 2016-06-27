@@ -14,6 +14,9 @@ type DataParseResult struct {
 
 type DataParseResultArray []DataParseResult
 
+const XAxisType_C = "category"
+const XAxisType_V = "value"
+
 func parseRawDatas(rawDatas []string, dataFormat string) (parseResultArr DataParseResultArray, err error) {
     for _, data := range rawDatas {
         xdata, ydata, err := parseSingleRawData(data, dataFormat)
@@ -77,10 +80,10 @@ func (pr *DataParseResultArray) detectXAxisType() (string, error) {
         for _, xd := range xdata {
             _, err := strconv.ParseFloat(xd, 64)
             if err != nil {
-                return "category"
+                return XAxisType_C
             }
         }
-        return "value"
+        return XAxisType_V
     }
 
     var checkXAxisData = func() error {
@@ -107,9 +110,14 @@ func (pr *DataParseResultArray) detectXAxisType() (string, error) {
     var xaxisType string
     for _, res := range *pr {
         xaxisType = detectFunc(res.xdata)
-        if xaxisType == "category" {
+        if xaxisType == XAxisType_C {
             break
         }
     }
-    return xaxisType, checkXAxisData()
+
+    if xaxisType == XAxisType_C {
+        return xaxisType, checkXAxisData()
+    } else {
+        return xaxisType, nil
+    }
 }

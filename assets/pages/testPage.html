@@ -1,30 +1,27 @@
-<html>
-  <head>
-    <meta charset="utf-8">
-    <script src="assets/require.js"></script>
-    <script src="assets/echarts-all.js"></script>
-  </head>
+<!DOCTYPE html>
+<html lang="en">
+  {{template "header.html"}}
 
   <body>
-    <!-- <h1 style="text-align: center"> 帐号分配图 </h1> -->
-    <!-- <div style="height:30px"></div> -->
+    {{template "navbarTop.html"}}
 
-    <div id="main" style="width: 1200px;height:800px; margin:0 auto;"></div>
+    <div>
+      <input id="chartdata-id" type="hidden" value="{{.Id}}"/>
+    </div>
 
-    <script type="text/javascript">
-     var geoCoordMap = {
-         {{ range $geo := .GeoData }}
-         "{{$geo.Name}}":[{{$geo.La}}, {{$geo.Lo}}],
-         {{end}}
-     };
+    <div class="container-fluid">
+      <div class="row">
+        {{template "navbarSide.html" 3}}
 
-     var shopValues = [
-         {{ range $shop := .ShopData }}
-         {name: "{{$shop.Name}}", value: {{$shop.AccountNumber}}},
-         {{end}}
-     ];
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+          <div id="main" style="width: 800px;height:600px; margin:10 auto;"></div>
+        </div>
 
-    </script>
-    <script src="assets/test.js"></script>
+      </div>
+
+    <script src="/assets/js/jquery-1.12.3.min.js"></script>
+    <script src="/assets/bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
+    <script src="/assets/js/echarts.min.js"></script>
+    <script src="/assets/js/test.js"></script>
   </body>
 </html>

@@ -23,8 +23,8 @@ type ReportItem struct {
 // }
 
 type PieDataItem struct {
-    Value int    `json:"value"`
     Name  string `json:"name"`
+    Value float64    `json:"value"`
 }
 
 type ChartData struct {

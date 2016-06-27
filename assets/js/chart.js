@@ -76,31 +76,31 @@ $.get("/chart-data/" + id, function(data, status){
     //var setter = allOptionSetters[handlerKey];
     //var option = setter(data);
     //console.debug("option:", option);
-    //console.debug("data json:", JSON.stringify(data, null, 2));
+    console.debug("data json:", JSON.stringify(data, null, 2));
     myChart.setOption(data);
 });
 
-var setFeatureBarData =  function(data) {
-    var option = barOption;
-    option.legend.data = data.legend;
-    option.xAxis[0].type = data.xAxisType;
-    var series0 = {};
-    series0.name = "xx";
-    series0.type = "bar";
-    series0.data = data.data;
-    option.series[0] = series0;
+// var setFeatureBarData =  function(data) {
+//     var option = barOption;
+//     option.legend.data = data.legend;
+//     option.xAxis[0].type = data.xAxisType;
+//     var series0 = {};
+//     series0.name = "xx";
+//     series0.type = "bar";
+//     series0.data = data.data;
+//     option.series[0] = series0;
 
-    return option;
-}
+//     return option;
+// }
 
-var setFeaturePieData = function(data) {
-    var option = basePieOption;
-    option.title.text = data.title;
-    option.series[0].data = data.data;
-    return option;
-}
+// var setFeaturePieData = function(data) {
+//     var option = basePieOption;
+//     option.title.text = data.title;
+//     option.series[0].data = data.data;
+//     return option;
+// }
 
-var allOptionSetters = {
-    "feat2-bar" : setFeatureBarData,
-    "feat10-pie" : setFeaturePieData
-}
+// var allOptionSetters = {
+//     "feat2-bar" : setFeatureBarData,
+//     "feat10-pie" : setFeaturePieData
+// }

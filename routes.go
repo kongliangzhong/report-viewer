@@ -17,6 +17,12 @@ var routes = []Route{
         Index,
     },
     Route{
+        "Test Page",
+        "Get",
+        "/test001",
+        TestPage,
+    },
+    Route{
         "New Chart",
         "Get",
         "/new-chart",

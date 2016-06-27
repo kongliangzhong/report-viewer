@@ -51,11 +51,11 @@ type SimpleData struct {
 
 type SeriesType struct {
     //SimpleData
-    Type   string      `json:"type"`
-    Name   string      `json:"name"`
-    Center []string    `json:"center"`
-    Radius string      `json:"radius"`
-    Data   interface{} `json:"data"`
+    Type   string      `json:"type,omitempty"`
+    Name   string      `json:"name,omitempty"`
+    Center []string    `json:"center,omitempty"`
+    Radius []string      `json:"radius,omitempty"`
+    Data   interface{} `json:"data,omitempty"`
 }
 
 type TooltipType struct {
@@ -64,18 +64,18 @@ type TooltipType struct {
 
 type BasePieOption struct {
     Timeline TimelineType `json:"timeline"`
-    Title    struct {
+    Title struct {
         Text    string `json:"text"`
         Subtext string `json:"subtext"`
         X       string `json:"x"`
-    } `json: "title"`
+    } `json:"title"`
 
     Tooltip struct {
         Trigger   string `json:"trigger"`
         Formatter string `json:"formatter"`
     } `json:"tooltip"`
 
-    Series []BasePieSeriesType `json: "series"`
+    Series []BasePieSeriesType `json:"series"`
 }
 
 type TimelineOption struct {
@@ -89,11 +89,11 @@ type FullOption struct {
 }
 
 type BasePieSeriesType struct {
-    Name   string        `json:"name"`
-    Type   string        `json:"type"`
-    Radius string        `json:"radius"`
-    Center []string      `json:"center"`
-    Data   []interface{} `json:"data"`
+    Name   string      `json:"name,omitempty"`
+    Type   string      `json:"type,omitempty"`
+    Radius []string      `json:"radius,omitempty"`
+    Center []string    `json:"center,omitempty"`
+    Data   interface{} `json:"data,omitempty"`
 
     ItemStyle ItemStyleType `json:"itemStyle"`
 }
@@ -103,9 +103,9 @@ type ItemStyleType struct {
 }
 
 type EmphasisType struct {
-    ShadowBlur    int    `json:"shadowBlur"`
-    ShadowOffsetX int    `json:"shadowOffsetX"`
-    ShadowColor   string `json:"shadowColor"`
+    ShadowBlur    int    `json:"shadowBlur,omitempty"`
+    ShadowOffsetX int    `json:"shadowOffsetX,omitempty"`
+    ShadowColor   string `json:"shadowColor,omitempty"`
 }
 
 func NewBaseBarOption() BaseBarOption {
@@ -135,7 +135,8 @@ func NewBasePieOption() BasePieOption {
     basePieOption.Tooltip.Trigger = "item"
     basePieOption.Tooltip.Formatter = "{b} : {c} ({d}%)"
 
-    series0 := BasePieSeriesType{Type: "pie", Radius: "55%", Center: []string{"50%", "60%"},
+    series0 := BasePieSeriesType{Type: "pie", Radius: []string{"0", "75%"},
+        Center: []string{"50%", "50%"},
         ItemStyle: ItemStyleType{
             Emphasis: EmphasisType{
                 ShadowBlur: 10, ShadowOffsetX: 0, ShadowColor: "rgba(0, 0, 0, 0.5)",

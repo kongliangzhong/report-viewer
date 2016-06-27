@@ -102,8 +102,8 @@ func ChartListPage(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-func Test(w http.ResponseWriter, r *http.Request) {
-    t, _ := template.ParseFiles("assets/pages/testPage.html")
+func TestPage(w http.ResponseWriter, r *http.Request) {
+    t, _ := template.ParseFiles(concatPageList("assets/pages/testPage.html")...)
     err := t.Execute(w, nil)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -168,7 +168,7 @@ func getChartData(ri ReportItem) interface{} {
     case "bar":
         return genBarOption(datas, timelineData, ri.DataFormat)
     case "pie":
-        return genPieOption(datas, timelineData)
+        return genPieOption(datas, timelineData, ri.DataFormat)
     default:
         log.Println("Unknown chart-type:", ri.ChartType)
         return nil
@@ -177,7 +177,7 @@ func getChartData(ri ReportItem) interface{} {
 
 func genBarOption(rawDatas, timelineData []string, dataFormat string) interface{} {
     var genSeriesData = func(xdata []string, ydata []float64, xaxisType string) (interface{}, error) {
-        if xaxisType == "category" {
+        if xaxisType == XAxisType_C {
             return ydata, nil
         } else {
             xdataF64, err := StrArrToF64Arr(xdata)
@@ -189,7 +189,7 @@ func genBarOption(rawDatas, timelineData []string, dataFormat string) interface{
     }
 
     baseBarOption := NewBaseBarOption()
-    baseBarOption.Timeline= TimelineType{"category", timelineData}
+    baseBarOption.Timeline= TimelineType{XAxisType_C, timelineData}
 
     parseResultArr, err := parseRawDatas(rawDatas, dataFormat)
     if err != nil {
@@ -205,7 +205,7 @@ func genBarOption(rawDatas, timelineData []string, dataFormat string) interface{
 
     baseBarOption.XAxis = append(baseBarOption.XAxis, SimpleData{Type: xaxisType})
 
-    if xaxisType == "category" {
+    if xaxisType == XAxisType_C {
         baseBarOption.XAxis[0].Data = parseResultArr[0].xdata
     }
 
@@ -231,7 +231,29 @@ func genBarOption(rawDatas, timelineData []string, dataFormat string) interface{
     return resultOption
 }
 
-func genPieOption(rawDatas, timelineData []string) interface{} {
+func genPieOption(rawDatas, timelineData []string, dataFormat string) interface{} {
+    basePieOption := NewBasePieOption()
+    basePieOption.Timeline= TimelineType{XAxisType_C, timelineData}
 
-    return nil
+    parseResultArr, err := parseRawDatas(rawDatas, dataFormat)
+    if err != nil {
+        log.Println("Error:", err.Error())
+        return nil
+    }
+
+    timelineOptions := []TimelineOption{}
+    for _, res := range parseResultArr {
+        tlo := TimelineOption{}
+        data := []PieDataItem{}
+        log.Println("res:", res)
+        for i, name := range res.xdata {
+            item := PieDataItem{name, res.ydata[0][i]}
+            data = append(data, item)
+        }
+        tlo.Series = append(tlo.Series, SeriesType{Data: data})
+        timelineOptions = append(timelineOptions, tlo)
+    }
+
+    resultOption := FullOption{basePieOption, timelineOptions}
+    return resultOption
 }
